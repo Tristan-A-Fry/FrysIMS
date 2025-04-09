@@ -1,0 +1,13 @@
+# .gitignore for backend
+# Ignore appsettings.json (contains sensitive API keys and DB connection strings)
+appsettings.json
+
+# Ignore build folders
+bin/
+obj/
+
+# Ignore user secrets (optional, if you're using this for local development)
+secrets/
+
+# Ignore any other files or directories that contain sensitive information
+.env
