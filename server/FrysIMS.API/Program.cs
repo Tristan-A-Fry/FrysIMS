@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Security.Claims;
 using FrysIMS.API.Data;
 using FrysIMS.API.Models;
 
@@ -33,9 +34,14 @@ builder.Services.AddSwaggerGen(options =>
 
     options.AddSecurityDefinition("Bearer", jwtSecurityScheme);  // ✅ For your API auth
 
+
+    // 👇 This is what was missing — applies the security globally to all endpoints
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
-        { jwtSecurityScheme, new string[] { } },
+        {
+            jwtSecurityScheme,
+            Array.Empty<string>()
+        }
     });
 });
 
@@ -67,9 +73,9 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = jwtSettings["Audience"],
         ValidateLifetime = true,
         ClockSkew = TimeSpan.Zero, 
+        NameClaimType = "sub",
+        RoleClaimType = ClaimTypes.Role
 
-
-        NameClaimType = "sub"
 
     };
 });
@@ -104,6 +110,46 @@ if (app.Environment.IsDevelopment())
         options.RoutePrefix = string.Empty; // Serve Swagger at root (http://localhost:5000)
         options.ConfigObject.AdditionalItems["persistAuthorization"] = true;
     });
+}
+
+
+//Seed Roles 
+async Task SeedRolesAsync(IServiceProvider services)
+{
+  var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+  string[] roles = { "Admin", "ProjectManager", "InventorySpecialist", "User"};
+  foreach (var role in roles)
+  {
+    if (!await roleManager.RoleExistsAsync(role))
+    {
+      await roleManager.CreateAsync(new IdentityRole(role));
+    }
+  }
+}
+
+//One time admin assignment 
+async Task SeedAdminAsync (IServiceProvider services)
+{
+  var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+  var adminEmail = "tristanfry1234@gmail.com";
+  var adminUser = await userManager.FindByEmailAsync(adminEmail);
+  if (adminUser != null && !(await userManager.IsInRoleAsync(adminUser, "Admin"))) 
+  {
+    await userManager.AddToRoleAsync(adminUser, "Admin");
+    Console.WriteLine($"Admin role assigned to {adminEmail}");
+  }
+  else
+  {
+    Console.WriteLine($"Admin user not found or already has a role");
+  }
+}
+
+//Apply seeding 
+using (var scope = app.Services.CreateScope())
+{
+  var services = scope.ServiceProvider;
+  await SeedRolesAsync(services);
+  await SeedAdminAsync(services);
 }
 
 app.UseCors("AllowAll");
