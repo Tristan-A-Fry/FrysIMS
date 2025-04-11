@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Security.Claims;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using FrysIMS.API.Data;
 using FrysIMS.API.Models;
 
@@ -21,28 +22,23 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo { Title = "FryReads API", Version = "v1" });
 
-    // 🔹 JWT Security (for your API authentication)
     var jwtSecurityScheme = new OpenApiSecurityScheme
     {
-        Name = "Authorization",
-        Description = "Enter 'Bearer {your JWT token}'",
-        In = ParameterLocation.Header,
         Type = SecuritySchemeType.Http,
-        Scheme = "Bearer",
-        BearerFormat = "JWT"
+        BearerFormat = "JWT",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Scheme = "bearer",
+        Reference = new OpenApiReference
+        {
+            Type = ReferenceType.SecurityScheme,
+            Id = "bearer"
+        }
     };
 
-    options.AddSecurityDefinition("Bearer", jwtSecurityScheme);  // ✅ For your API auth
+    options.AddSecurityDefinition("bearer", jwtSecurityScheme);
+    options.OperationFilter<AuthOperationFilter>();
 
-
-    // 👇 This is what was missing — applies the security globally to all endpoints
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            jwtSecurityScheme,
-            Array.Empty<string>()
-        }
-    });
 });
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

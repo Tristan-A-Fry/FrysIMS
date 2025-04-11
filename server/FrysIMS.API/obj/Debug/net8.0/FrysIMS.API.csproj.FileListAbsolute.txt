@@ -157,3 +157,6 @@ E:\FrysIMS\server\FrysIMS.api\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.d
 E:\FrysIMS\server\FrysIMS.api\bin\Debug\net8.0\System.Security.Cryptography.Pkcs.dll
 E:\FrysIMS\server\FrysIMS.api\bin\Debug\net8.0\System.Security.Cryptography.Xml.dll
 E:\FrysIMS\server\FrysIMS.api\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll
+E:\FrysIMS\server\FrysIMS.api\bin\Debug\net8.0\Scrutor.dll
+E:\FrysIMS\server\FrysIMS.api\bin\Debug\net8.0\Swashbuckle.AspNetCore.Filters.dll
+E:\FrysIMS\server\FrysIMS.api\bin\Debug\net8.0\Swashbuckle.AspNetCore.Filters.Abstractions.dll

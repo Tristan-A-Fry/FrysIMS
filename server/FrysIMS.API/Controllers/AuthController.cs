@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
-using Swashbuckle.AspNetCore.Annotations;
 
 [ApiController]
 [Route("api/auth")]
@@ -17,7 +16,6 @@ public class AuthController : ControllerBase
 
     [Authorize(Roles="Admin")] 
     [HttpPost("register")]
-    [SwaggerOperation(Summary = "Register a new user", Security = new[] { "Bearer" })]
     public async Task<IActionResult> Register([FromBody] RegisterDto request)
     {
 
@@ -41,7 +39,7 @@ public class AuthController : ControllerBase
         //
         // var result = await _userService.RegisterUserAsync(request.Email, request.Password);
         // return result ? Ok("User registered successfully.") : BadRequest("Registration failed.");
-        var result = await _userService.RegisterUserAsync(request.Email, request.Password);
+        var result = await _userService.RegisterUserAsync(request.Email, request.Password, request.Role);
     
         if (result) {
             return Ok(new { message = "User registered successfully." }); // Return as JSON
@@ -59,7 +57,7 @@ public class AuthController : ControllerBase
         return token != null ? Ok(new { Token = token }) : Unauthorized();
     }
 
-    [Authorize]
+    [Authorize(Roles="Admin")]
     [HttpGet("whoami")]
     public IActionResult WhoAmI()
     {
