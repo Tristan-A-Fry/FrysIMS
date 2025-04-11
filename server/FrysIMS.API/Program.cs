@@ -20,7 +20,7 @@ var secretKey = jwtSettings["Secret"];
 
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "FryReads API", Version = "v1" });
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "FrysIMS API", Version = "v1" });
 
     var jwtSecurityScheme = new OpenApiSecurityScheme
     {
@@ -89,8 +89,12 @@ builder.Services.AddCors(options =>
 // ✅ Add authentication and authorization
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
+
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
+
+builder.Services.AddScoped<IStockRepository, StockRepository>();
+builder.Services.AddScoped<IStockService, StockService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
