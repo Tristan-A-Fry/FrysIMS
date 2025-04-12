@@ -2,13 +2,15 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using FrysIMS.API.Models;
+using FrysIMS.API.Data;
 
 [ApiController]
 [Route("api/materialLocation")] 
-[Authorize(Roles="InventorySpecialist")]
+[Authorize(Roles="Admin,InventorySpecialist")]
 public class MaterialLocationController : ControllerBase
 {
   private readonly IMaterialLocationService _locationService; 
+
   public MaterialLocationController(IMaterialLocationService locationService)
   {
     _locationService = locationService;

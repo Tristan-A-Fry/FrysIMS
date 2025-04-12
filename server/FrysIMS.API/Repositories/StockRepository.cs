@@ -43,6 +43,4 @@ public class StockRepository : IStockRepository
     await _context.SaveChangesAsync();
   }
 
-
-
 }

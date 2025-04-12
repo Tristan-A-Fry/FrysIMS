@@ -99,6 +99,12 @@ builder.Services.AddScoped<IStockService, StockService>();
 builder.Services.AddScoped<IMaterialLocationRepository, MaterialLocationRepository>();
 builder.Services.AddScoped<IMaterialLocationService, MaterialLocationService>();
 
+builder.Services.AddScoped<IProjectMaterialRepository, ProjectMaterialRepository>();
+builder.Services.AddScoped<IProjectMaterialService, ProjectMaterialService>();
+
+builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+builder.Services.AddScoped<IProjectService, ProjectService>();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

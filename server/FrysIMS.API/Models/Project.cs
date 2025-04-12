@@ -12,9 +12,9 @@ namespace FrysIMS.API.Models
 
     public DateTime DateCreated {get; set;} = DateTime.UtcNow;
 
-    public string CreatedByUserId {get; set;} // FK
-    public ApplicationUser CreatedByUser {get; set;}
-
+    public string? CreatedByUserId {get; set;} // FK
+    public ApplicationUser? CreatedByUser {get; set;}
+    
     public List<ProjectMaterial> ProjectMaterials {get; set;} = new();
 
   }
