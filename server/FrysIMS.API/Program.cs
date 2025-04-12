@@ -96,6 +96,9 @@ builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IStockRepository, StockRepository>();
 builder.Services.AddScoped<IStockService, StockService>();
 
+builder.Services.AddScoped<IMaterialLocationRepository, MaterialLocationRepository>();
+builder.Services.AddScoped<IMaterialLocationService, MaterialLocationService>();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

@@ -51,7 +51,7 @@ public class StockService : IStockService
     existing.Name = stock.Name;
     existing.Quantity = stock.Quantity;
     existing.Unit = stock.Unit;
-    existing.OriginalPrice = stock.OriginalPrice;
+    existing.OriginalPricePerUnit = stock.OriginalPricePerUnit;
 
     await _repository.UpdateAsync(existing);
     return true;

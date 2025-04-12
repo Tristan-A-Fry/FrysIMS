@@ -11,7 +11,7 @@ namespace FrysIMS.API.Models
 
     public string Unit {get; set;} = "unit";
 
-    public decimal OriginalPrice {get; set;} // per unit 
+    public decimal OriginalPricePerUnit {get; set;} // per unit 
 
     public string? CreatedByUserId {get; set;} // Foreign Key -> ApplicationUser.Id
 

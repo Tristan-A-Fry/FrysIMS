@@ -5,13 +5,13 @@ namespace FrysIMS.API.Models
     public int Id {get; set;}
 
     public int ProjectMaterialId {get; set;} //Fk
-    public ProjectMaterial ProjectMaterial {get; set;}
+    public ProjectMaterial? ProjectMaterial {get; set;}
 
-    public string Status {get; set;} = "In Transit";
+    public string Status {get; set;} = "Pending Dispatch";
 
     public DateTime TimeStamp {get; set;} = DateTime.UtcNow;
 
-    public string UpdatedByUserId {get; set;} //Fk
-    public ApplicationUser UpdatedByUser {get; set;}
+    public string? UpdatedByUserId {get; set;} //Fk
+    public ApplicationUser? UpdatedByUser {get; set;}
   }
 }
