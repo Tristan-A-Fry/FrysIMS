@@ -83,7 +83,7 @@ public class StockController : ControllerBase
     return NoContent();
   }
 
-  [HttpDelete] 
+  [HttpDelete("{id}")] 
   public async Task<IActionResult> DeleteStock(int id)
   {
     var success = await _stockService.DeleteStockAsync(id);

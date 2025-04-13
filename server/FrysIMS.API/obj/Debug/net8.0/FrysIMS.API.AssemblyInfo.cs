@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FrysIMS.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+17f76209b6aca7b1c600c575e1199cd75aa8e803")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f4c1dc12521cf9a2428a86ff0e5a3a64bec61747")]
 [assembly: System.Reflection.AssemblyProductAttribute("FrysIMS.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FrysIMS.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -3,6 +3,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using FrysIMS.API.Models;
 using FrysIMS.API.Data;
+using FrysIMS.API.Dtos;
 
 [ApiController]
 [Route("api/materialLocation")] 
@@ -19,11 +20,19 @@ public class MaterialLocationController : ControllerBase
   [HttpGet]
   public async Task<IActionResult> GetAllMaterialLocation()
   {
-    var locationList = await _locationService.GetAllMaterialLocationAsync();
-    return Ok(locationList);
+    var locations  = await _locationService.GetAllMaterialLocationAsync();
+    var dtoList = locations.Select(ml => new MaterialLocationDto
+        {
+          Id = ml.Id,
+          Status = ml.Status,
+          TimeStamp = ml.TimeStamp,
+          ProjectMaterialId = ml.ProjectMaterialId,
+          UpdatedByUserId = ml.UpdatedByUserId
+        }).ToList();
+    return Ok(dtoList);
   }
 
-  [HttpGet("id")]
+  [HttpGet("{id}", Name = "GetMaterialLocationById")]
   public async Task<IActionResult> GetMaterialLocationByIdAsync(int id)
   {
     var location = await _locationService.GetMaterialLocationByIdAsync(id);
@@ -33,7 +42,7 @@ public class MaterialLocationController : ControllerBase
   }
 
   [HttpPost] 
-  public async Task<IActionResult> CreateMaterialLocation([FromBody] MaterialLocation location)
+  public async Task<IActionResult> CreateMaterialLocation([FromBody] MaterialLocationCreate dto)
   {
     var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value; 
     if(string.IsNullOrEmpty(userId))
@@ -41,27 +50,56 @@ public class MaterialLocationController : ControllerBase
       return Unauthorized("Could Not Determine User Identity");
     }
 
-    location.UpdatedByUserId = userId;
-    location.TimeStamp = DateTime.UtcNow;
+    var newLocation = new MaterialLocation
+    {
+      ProjectMaterialId = dto.ProjectMaterialId,
+      Status = dto.Status,
+      UpdatedByUserId = userId
+    };
 
-    var success = await _locationService.AddMaterialLocationAsync(location);
+
+    var success = await _locationService.AddMaterialLocationAsync(newLocation);
     if(!success)
     {
       return BadRequest("Invalid ProjectMaterial ID or other error");
     }
 
-    return Ok(location);
+    var responseDto = new MaterialLocationDto
+    {
+        Id = newLocation.Id,
+        Status = newLocation.Status,
+        TimeStamp = newLocation.TimeStamp,
+        ProjectMaterialId = newLocation.ProjectMaterialId,
+        UpdatedByUserId = newLocation.UpdatedByUserId
+    };
+
+    /*TODO: Ask more questions about this */
+
+    return CreatedAtRoute(
+        "GetMaterialLocationById",
+        new { id = newLocation.Id },
+        responseDto
+    );
   }
 
   [HttpPut("{id}")]
-  public async Task<IActionResult> Update(int id, [FromBody] MaterialLocation updated)
+  public async Task<IActionResult> Update(int id, [FromBody] MaterialLocationupdateDto dto)
   {
-      var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-      if (string.IsNullOrEmpty(userId))
-          return Unauthorized();
+      if(id != dto.Id)
 
-      updated.Id = id;
-      updated.UpdatedByUserId = userId;
+      {
+        return BadRequest("ID Mismatch");
+      }
+
+      var updated = new MaterialLocation
+      {
+        Id = dto.Id,
+        ProjectMaterialId = dto.ProjectMaterialId,
+        Status = dto.Status,
+        TimeStamp = DateTime.UtcNow,
+        UpdatedByUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+      };
+
 
       var success = await _locationService.UpdateMaterialLocationAsync(updated);
       if (!success)
@@ -70,7 +108,6 @@ public class MaterialLocationController : ControllerBase
       return NoContent();
   }
 
-  // DELETE: /api/materiallocation/5
   [HttpDelete("{id}")]
   public async Task<IActionResult> Delete(int id)
   {
@@ -79,5 +116,10 @@ public class MaterialLocationController : ControllerBase
           return NotFound("Material location not found.");
 
       return NoContent();
+  }
+  [HttpGet("test/{id}")]
+  public IActionResult TestRoute(int id)
+  {
+      return Ok(new { Message = "Matched Route!", Id = id });
   }
 } 
