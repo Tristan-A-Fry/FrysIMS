@@ -72,10 +72,19 @@ public class StockController : ControllerBase
     return CreatedAtAction(nameof(GetStockById), new {id = stock.Id} , dto);
   }
 
-  [HttpPut]
-  public async Task<IActionResult> UpdateStock(int id, [FromBody] Stock stock)
+  [HttpPut("{id}")]
+  public async Task<IActionResult> UpdateStock(int id, [FromBody] StockUpdateDto dto)
   {
-    if (id != stock.Id) return BadRequest("ID mismatch");
+    if (id != dto.Id) return BadRequest("ID mismatch");
+
+    var stock = await _stockService.GetStockByIdAsync(id);
+
+    if(stock == null) return NotFound();
+
+    stock.Name = dto.Name;
+    stock.Quantity = dto.Quantity;
+    stock.Unit = dto.Unit;
+    stock.OriginalPricePerUnit = dto.OriginalPricePerUnit;
 
     var success = await _stockService.UpdateStockAsync(stock);
     if(!success) return NotFound();

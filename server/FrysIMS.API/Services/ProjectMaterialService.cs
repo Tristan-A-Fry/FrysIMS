@@ -1,5 +1,6 @@
 using FrysIMS.API.Models;
 using FrysIMS.API.Data;
+using Microsoft.EntityFrameworkCore;
 
 public interface IProjectMaterialService
 {
@@ -23,12 +24,19 @@ public class ProjectMaterialService : IProjectMaterialService
 
   public async Task<List<ProjectMaterial>> GetAllProjectMaterialAsync()
   {
-    return await _repository.GetAllAsync();
+    // return await _repository.GetAllAsync();
+    return await _context.ProjectMaterials
+        .Include(pm => pm.Stock)
+        .Include(pm => pm.Project)
+        .ToListAsync();
   }
 
   public async Task<ProjectMaterial> GetProjectMaterialByIdAsync(int id)
   {
-    return await _repository.GetByIdAsync(id);
+      return await _context.ProjectMaterials
+      .Include(pm => pm.Stock)
+      .Include(pm => pm.Project)
+      .FirstOrDefaultAsync(pm => pm.Id == id);
   }
 
   public async Task<bool> AddProjectMaterialAsync(ProjectMaterial material)
@@ -82,6 +90,13 @@ public class ProjectMaterialService : IProjectMaterialService
 
     if(material == null) return false;
 
+    var stock = await _context.Stock.FindAsync(material.StockId);
+    if(stock != null)
+    {
+      stock.Quantity += material.QuantityUsed;
+    }
+
+    _context.ProjectMaterials.Remove(material);
     await _repository.DeleteAsync(material);
     return true;
   }

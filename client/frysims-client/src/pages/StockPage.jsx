@@ -11,11 +11,17 @@ const StockPage = () => {
   const [unit, setUnit] = useState("unit");
   const [originalPricePerUnit, setOriginalPricePerUnit] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [stockToEdit, setStockToEdit] = useState(null);
+  const [editForm, setEditForm] = useState({ name: "", quantity: 0, unit: "", originalPricePerUnit: 0 });
 
   useEffect(() => {
     fetchStocks();
     checkUserRole();
   }, []);
+
+
+  const unitOptions = ["Pieces", "Ft", "Lbs", "Gallons", "Boxes"];
 
   const checkUserRole = () => {
     const token = localStorage.getItem("token");
@@ -74,10 +80,33 @@ const StockPage = () => {
       }
     } catch (err) {
       console.error("Add stock error:", err);
-;
     }
   };
 
+
+  const handleUpdate = async (id) => {
+
+    if (!window.confirm("Are you sure you want to update this stock item?")) return;
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/stock/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify(editForm)
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to update stock");
+      }
+
+      fetchStocks();
+      closeModal();
+    } catch (error) {
+      console.error("Error updating stock:", error);
+    }
+  };
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this stock item?")) return;
@@ -99,9 +128,29 @@ const StockPage = () => {
     } catch (error) {
       console.error("Error deleting stock:", error);
     }
-    };
+  };
 
-  const unitOptions = ["Pieces", "Ft", "Lbs", "Gallons", "Boxes"];
+  const openEditModal = (stock) => {
+    setStockToEdit(stock);
+    setEditForm({
+      id: stock.id,
+      name: stock.name,
+      quantity: stock.quantity,
+      unit: stock.unit,
+      originalPricePerUnit: stock.originalPricePerUnit
+    });
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setStockToEdit(null);
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditForm((prev) => ({ ...prev, [name]: value }));
+  };
 
   return (
     <div className="p-8 text-white bg-gray-900 min-h-screen">
@@ -115,6 +164,7 @@ const StockPage = () => {
               <th className="p-3">Quantity</th>
               <th className="p-3">Unit</th>
               <th className="p-3">Original Price Per Unit</th>
+              {isAdmin && <th className="p-3">Actions</th>}
             </tr>
           </thead>
           <tbody>
@@ -125,14 +175,21 @@ const StockPage = () => {
                 <td className="p-3">{stock.unit}</td>
                 <td className="p-3">${stock.originalPricePerUnit}</td>
                 {isAdmin && (
-                  <td className="p-3">
+                  <td className="p-3 space-x-2">
+                    <button
+                      onClick={() => openEditModal(stock)} // ✅ Fixed
+                      className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
+                    >
+                      Update
+                    </button>
                     <button
                       onClick={() => handleDelete(stock.id)}
                       className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded"
                     >
                       Delete
                     </button>
-                  </td> )}
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
@@ -140,7 +197,10 @@ const StockPage = () => {
       </div>
 
       {isAdmin && (
-        <form onSubmit={handleAddStock} className="bg-gray-800 p-6 rounded shadow-md max-w-md space-y-4">
+        <form
+          onSubmit={handleAddStock}
+          className="bg-gray-800 p-6 rounded shadow-md max-w-md space-y-4"
+        >
           <h3 className="text-xl font-semibold">Add New Stock</h3>
           <input
             type="text"
@@ -178,14 +238,70 @@ const StockPage = () => {
             className="w-full p-2 rounded bg-gray-700 text-white"
             required
           />
-          <button type="submit" className="bg-fryblue text-white px-4 py-2 rounded hover:bg-cyan-500">
+          <button
+            type="submit"
+            className="bg-fryblue text-white px-4 py-2 rounded hover:bg-cyan-500"
+          >
             Add Stock
           </button>
         </form>
+      )}
+
+      {/* ✅ Edit Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
+          <div className="bg-white p-6 rounded shadow-lg w-96 text-black">
+            <h2 className="text-xl font-semibold mb-4">Edit Stock</h2>
+            <input
+              name="name"
+              value={editForm.name}
+              onChange={handleEditChange}
+              className="w-full mb-2 p-2 border rounded"
+              placeholder="Name"
+            />
+            <input
+              name="quantity"
+              type="number"
+              value={editForm.quantity}
+              onChange={handleEditChange}
+              className="w-full mb-2 p-2 border rounded"
+              placeholder="Quantity"
+            />
+            <input
+              name="unit"
+              value={editForm.unit}
+              onChange={handleEditChange}
+              className="w-full mb-2 p-2 border rounded"
+              placeholder="Unit"
+            />
+            <input
+              name="originalPricePerUnit"
+              type="number"
+              step="0.01"
+              value={editForm.originalPricePerUnit}
+              onChange={handleEditChange}
+              className="w-full mb-4 p-2 border rounded"
+              placeholder="Original Price Per Unit"
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={closeModal}
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleUpdate(editForm.id)}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
 };
 
-export default StockPage;
-
+  export default StockPage;

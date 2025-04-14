@@ -1,8 +1,11 @@
 using FrysIMS.API.Models;
+using FrysIMS.API.Data;
+using Microsoft.EntityFrameworkCore;
+using FrysIMS.API.Dtos;
 
 public interface IProjectService
 {
-  Task<List<Project>> GetAllProjectAsync();
+  Task<List<ProjectDto>> GetAllProjectAsync();
   Task<Project> GetProjectByIdAsync(int id);
   Task<bool> AddProjectAsync(Project project, string userId);
   Task<bool> UpdateProjectAsync(Project project, string userId);
@@ -12,15 +15,38 @@ public interface IProjectService
 public class ProjectService : IProjectService
 {
   private readonly IProjectRepository _repository;
+  private readonly ApplicationDbContext _context;
 
-  public ProjectService(IProjectRepository repository)
+  public ProjectService(IProjectRepository repository, ApplicationDbContext context)
   {
     _repository = repository;
+    _context = context;
   } 
 
-  public async Task<List<Project>> GetAllProjectAsync()
+  public async Task<List<ProjectDto>> GetAllProjectAsync()
   {
-    return await _repository.GetAllAsync();
+    // return await _repository.GetAllAsync();
+    var projects = await _context.Projects
+        .Include(p => p.ProjectMaterials)
+        .ThenInclude(pm => pm.Stock)
+        .ToListAsync();
+
+    return projects.Select(p => new ProjectDto
+    {
+        Id = p.Id,
+        Name = p.Name,
+        Budget = p.Budget,
+        CreatedByUserId = p.CreatedByUserId,
+        DateCreated = p.DateCreated,
+        ProjectMaterials = p.ProjectMaterials.Select(pm => new ProjectMaterialDto
+        {
+            Id = pm.Id,
+            ProjectName = pm.Project?.Name ?? "Unknown",
+            StockName = pm.Stock?.Name ?? "Unknown",
+            QuantityUsed = pm.QuantityUsed,
+            UnitCostSnapshot = pm.UnitCostSnapshot
+        }).ToList()
+    }).ToList();
   }
 
   public async Task<Project> GetProjectByIdAsync(int id)

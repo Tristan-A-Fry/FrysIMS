@@ -38,6 +38,8 @@ const Navbar = () => {
         {/* Nav Links: Hidden on small screens */}
         <div className="hidden md:flex space-x-8 items-center text-lg font-semibold">
           <Link to="/" className="hover:text-gray-300">Home</Link>
+          <Link to="/stock" className="hover:text-gray-300">Stock</Link>
+          <Link to="/projects" className="hover:text-gray-300">Projects</Link>
           {isAuthenticated ? (
             <button
               onClick={() => {
@@ -63,6 +65,8 @@ const Navbar = () => {
       {menuOpen && (
         <div className="md:hidden flex flex-col space-y-3 mt-4 px-4 text-lg font-semibold">
           <Link to="/" onClick={() => setMenuOpen(false)} className="hover:text-gray-300">Home</Link>
+          <Link to="/projects" onClick={() => setMenuOpen(false)} className="hover:text-gray-300">Projects</Link>
+          <Link to="/stock" onClick={() => setMenuOpen(false)} className="hover:text-gray-300">Stock</Link>
           {isAuthenticated ? (
             <button
               onClick={() => {

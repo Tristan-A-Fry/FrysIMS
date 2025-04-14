@@ -95,4 +95,23 @@ public class ProjectMaterialController : ControllerBase
 
     return NoContent();
   }
+  [HttpGet("project/{projectId}")]
+  public async Task<IActionResult> GetMaterialsByProjectId(int projectId)
+  {
+      var materials = await _materialService.GetAllProjectMaterialAsync();
+
+      var filtered = materials
+          .Where(pm => pm.ProjectId == projectId)
+          .Select(pm => new ProjectMaterialDto
+          {
+              Id = pm.Id,
+              ProjectName = pm.Project?.Name ?? "Unknown",
+              StockName = pm.Stock?.Name ?? "Unknown",
+              QuantityUsed = pm.QuantityUsed,
+              UnitCostSnapshot = pm.UnitCostSnapshot
+          })
+          .ToList();
+
+      return Ok(filtered);
+  }
 }
