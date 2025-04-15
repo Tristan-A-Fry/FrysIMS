@@ -123,6 +123,7 @@ const ProjectsPage = () => {
 
       if (!res.ok) throw new Error("Failed to assign material");
       alert("Material assigned successfully.");
+      fetchStockList();
       fetchProjectMaterials(selectedProjectId);
       setQuantityUsed("");
       setSelectedStockId("");
@@ -149,6 +150,7 @@ const ProjectsPage = () => {
 
       // Refetch stock list after deletion
       fetchProjects();
+      fetchStockList();
     } catch (error) {
       console.error("Error deleting project:", error);
     }
@@ -198,7 +200,17 @@ const ProjectsPage = () => {
               <tr key={project.id} className="border-b border-gray-700">
                 <td className="py-2 px-4">{project.name}</td>
                 <td className="py-2 px-4">${project.budget}</td>
-                <td className="py-2 px-4">
+                <td
+                  className={`py-2 px-4 ${
+                    project.budget -
+                      project.projectMaterials.reduce(
+                        (acc, mat) => acc + mat.unitCostSnapshot * mat.quantityUsed,
+                        0
+                      ) < 0
+                      ? "text-red-500"
+                      : ""
+                  }`}
+                >
                   ${(
                     project.budget -
                     project.projectMaterials.reduce(
@@ -208,7 +220,7 @@ const ProjectsPage = () => {
                   ).toFixed(2)}
                 </td>
                 <td className="py-2 px-4">{new Date(project.dateCreated).toLocaleDateString()}</td>
-                <td className="py-2 px-4">{project.createdByUserId}</td>
+                <td className="py-2 px-4">{project.createdByUserEmail}</td>
                 <td className="py-2 px-4">
                   {project.createdByUserId === currentUserId && (
                     <button
@@ -299,7 +311,7 @@ const ProjectsPage = () => {
 
             <button
               className="bg-fryblue px-4 py-2 rounded hover:bg-cyan-500 mr-4"
-              onClick={handleAssignMaterial}
+              onClick={() => {handleAssignMaterial(); fetchStockList();}}
             >
               Assign
             </button>

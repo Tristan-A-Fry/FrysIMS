@@ -27,6 +27,7 @@ public class ProjectService : IProjectService
   {
     // return await _repository.GetAllAsync();
     var projects = await _context.Projects
+        .Include(p => p.CreatedByUser)
         .Include(p => p.ProjectMaterials)
         .ThenInclude(pm => pm.Stock)
         .ToListAsync();
@@ -37,6 +38,7 @@ public class ProjectService : IProjectService
         Name = p.Name,
         Budget = p.Budget,
         CreatedByUserId = p.CreatedByUserId,
+        CreatedByUserEmail = p.CreatedByUser.Email,
         DateCreated = p.DateCreated,
         ProjectMaterials = p.ProjectMaterials.Select(pm => new ProjectMaterialDto
         {
@@ -88,12 +90,25 @@ public class ProjectService : IProjectService
 
   public async Task<bool> DeleteProjectAsync(int id, string userId)
   {
-    var project = await _repository.GetByIdAsync(id);
-    if(project == null || project.CreatedByUserId != userId)
+    var project = await _context.Projects
+        .Include(p => p.ProjectMaterials)
+        .ThenInclude(pm => pm.Stock) // needed for accessing stock
+        .FirstOrDefaultAsync(p => p.Id == id);
+
+    if (project == null) return false;
+
+    // Re-add material quantities back to stock
+    foreach (var material in project.ProjectMaterials)
     {
-      return false;
+        if (material.Stock != null)
+        {
+            material.Stock.Quantity += material.QuantityUsed;
+        }
+
+        _context.ProjectMaterials.Remove(material); // Clean up assigned materials
     }
 
+    _context.Projects.Remove(project); // Delete the project
     await _repository.DeleteAsync(project);
     return true;
   }

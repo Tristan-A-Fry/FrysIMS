@@ -30,13 +30,13 @@ const LoginPage = () => {
       const data = await res.json();
       login(data.token);
 
-      const decoded = jwtDecode(token);
+      const decoded = jwtDecode(data.token);
       const userRole = decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
 
       if (userRole === "Admin") {
-        navigate("/");
+        navigate("/projects");
       } else {
-        navigate("/dashboard");
+        navigate("/");
       }
     } catch (err) {
       setError("Something went wrong.");

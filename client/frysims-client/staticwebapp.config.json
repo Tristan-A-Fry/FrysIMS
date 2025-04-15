@@ -1,0 +1,20 @@
+{
+  "routes": [
+    {
+      "route": "/login",
+      "rewrite": "/index.html"
+    },
+    {
+      "route": "/home",
+      "rewrite": "/index.html"
+    },
+    {
+      "route": "/stock",
+      "rewrite": "/index.html"
+    },
+    {
+      "route": "/projects",
+      "rewrite": "/index.html"
+    }
+  ]
+}
