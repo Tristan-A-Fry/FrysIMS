@@ -1,12 +1,28 @@
 
+import { jwtDecode } from "jwt-decode";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect ,useState } from "react";
 
 const Navbar = () => {
   const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [userRole, setUserRole] = useState("");
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        const role = decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+        setUserRole(role);
+      } catch (err) {
+        console.error("Invalid token:", err);
+        setUserRole("");
+      }
+    }
+  }, []);
 
   return (
     <nav className="bg-gray-800 text-white p-4 top-0 w-full shadow-md">
@@ -40,12 +56,19 @@ const Navbar = () => {
           <Link to="/" className="hover:text-gray-300">Home</Link>
           <Link to="/stock" className="hover:text-gray-300">Stock</Link>
           <Link to="/projects" className="hover:text-gray-300">Projects</Link>
+
+          {isAuthenticated && userRole === "Admin" && (
+            <button
+              onClick={() => navigate("/admin-dashboard")}
+              className="bg-[#2ac9ff] px-5 py-2 rounded-lg hover:shadow-lg hover:shadow-[0_0_10px_#2ac9ff]"
+            >
+              Admin Dashboard
+            </button>
+          )}
+
           {isAuthenticated ? (
             <button
-              onClick={() => {
-                logout();
-                navigate("/login");
-              }}
+              onClick={logout}
               className="bg-[#2ac9ff] px-5 py-2 rounded-lg hover:shadow-lg hover:shadow-[0_0_10px_#2ac9ff]"
             >
               Logout

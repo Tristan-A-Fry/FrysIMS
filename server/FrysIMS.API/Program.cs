@@ -42,7 +42,7 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("ProductionConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("LocalConnection")));
 
 // ✅ Add Identity system
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()

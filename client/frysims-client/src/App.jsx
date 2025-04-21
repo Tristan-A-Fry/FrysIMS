@@ -5,6 +5,7 @@ import HomePage from "./pages/HomePage"
 import LoginPage from "./pages/LoginPage";
 import StockPage from "./pages/StockPage";
 import ProjectsPage from "./pages/ProjectsPage";
+import AdminPage from "./pages/AdminPage";
 import { AuthProvider } from "./context/AuthContext"; 
 
 function App() {
@@ -24,6 +25,10 @@ function App() {
           <Route
             path="/projects"
             element={token ? <ProjectsPage /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/admin-dashboard"
+            element={token ? <AdminPage /> : <Navigate to="/" />}
           />
         </Routes>
       </Router>
