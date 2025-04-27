@@ -35,7 +35,7 @@ public class UserService : IUserService
     {
         var user = new ApplicationUser { UserName = email, Email = email };
         var result = await _userManager.CreateAsync(user, password);
-        var allowedRoles = new[] {"User", "InventorySpecialist", "ProjectManager"};
+        var allowedRoles = new[] {"User", "InventorySpecialist", "ProjectManager", "Admin"};
         
         if(!allowedRoles.Contains(role))
         {

@@ -1,5 +1,6 @@
 
 import Navbar from "./components/Navbar"; // Adjust path based on your folder structure
+import AdminRoute from "./components/AdminRoute"; // Add this
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import HomePage from "./pages/HomePage"
 import LoginPage from "./pages/LoginPage";
@@ -28,7 +29,11 @@ function App() {
           />
           <Route
             path="/admin-dashboard"
-            element={token ? <AdminPage /> : <Navigate to="/" />}
+            element={
+              <AdminRoute>
+                <AdminPage />
+              </AdminRoute>
+            }
           />
         </Routes>
       </Router>

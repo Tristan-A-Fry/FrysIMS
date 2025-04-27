@@ -6,7 +6,7 @@ using FrysIMS.API.Dtos;
 
 [ApiController]
 [Route("api/stock")]
-[Authorize(Roles = "Admin,ProjectManager")]
+// [Authorize(Roles = "Admin,ProjectManager")]
 public class StockController : ControllerBase
 {
 
@@ -17,6 +17,7 @@ public class StockController : ControllerBase
     _stockService = stockService;
   }
 
+  [Authorize]
   [HttpGet]
   public async Task<IActionResult> GetAllStock()
   {
@@ -35,6 +36,8 @@ public class StockController : ControllerBase
     return Ok(stockDtos);
   }
 
+
+  [Authorize(Roles = "Admin,InventorySpecialist")]
   [HttpGet("id")]
   public async Task<IActionResult> GetStockById(int id)
   {
@@ -43,6 +46,7 @@ public class StockController : ControllerBase
     return Ok(stock);
   }
 
+  [Authorize(Roles = "Admin,InventorySpecialist")]
   [HttpPost]
   public async Task<IActionResult> CreateStock([FromBody] StockCreateDto dto)
   {
@@ -72,6 +76,8 @@ public class StockController : ControllerBase
     return CreatedAtAction(nameof(GetStockById), new {id = stock.Id} , dto);
   }
 
+
+  [Authorize(Roles = "Admin,InventorySpecialist")]
   [HttpPut("{id}")]
   public async Task<IActionResult> UpdateStock(int id, [FromBody] StockUpdateDto dto)
   {
@@ -92,6 +98,7 @@ public class StockController : ControllerBase
     return NoContent();
   }
 
+  [Authorize(Roles = "Admin,InventorySpecialist")]
   [HttpDelete("{id}")] 
   public async Task<IActionResult> DeleteStock(int id)
   {
@@ -100,6 +107,4 @@ public class StockController : ControllerBase
 
     return NoContent();
   }
-
-
 }

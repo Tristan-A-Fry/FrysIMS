@@ -10,7 +10,8 @@ const StockPage = () => {
   const [quantity, setQuantity] = useState(0);
   const [unit, setUnit] = useState("unit");
   const [originalPricePerUnit, setOriginalPricePerUnit] = useState("");
-  const [isAdmin, setIsAdmin] = useState(false);
+  // const [canEditStock, setIsAdmin] = useState(false);
+  const [canEditStock, setCanEditStock] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [stockToEdit, setStockToEdit] = useState(null);
   const [editForm, setEditForm] = useState({ name: "", quantity: 0, unit: "", originalPricePerUnit: 0 });
@@ -28,7 +29,7 @@ const StockPage = () => {
     if (!token) return;
     const decoded = jwtDecode(token);
     const role = decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
-    setIsAdmin(role === "Admin");
+    setCanEditStock(role === "Admin" || role === "InventorySpecialist");
   };
 
   const fetchStocks = async () => {
@@ -164,7 +165,7 @@ const StockPage = () => {
               <th className="p-3">Quantity</th>
               <th className="p-3">Unit</th>
               <th className="p-3">Original Price Per Unit</th>
-              {isAdmin && <th className="p-3">Actions</th>}
+              {canEditStock && <th className="p-3">Actions</th>}
             </tr>
           </thead>
           <tbody>
@@ -174,7 +175,7 @@ const StockPage = () => {
                 <td className="p-3">{stock.quantity}</td>
                 <td className="p-3">{stock.unit}</td>
                 <td className="p-3">${stock.originalPricePerUnit}</td>
-                {isAdmin && (
+                {canEditStock && (
                   <td className="p-3 space-x-2">
                     <button
                       onClick={() => openEditModal(stock)} // ✅ Fixed
@@ -196,7 +197,7 @@ const StockPage = () => {
         </table>
       </div>
 
-      {isAdmin && (
+      {canEditStock && (
         <form
           onSubmit={handleAddStock}
           className="bg-gray-800 p-6 rounded shadow-md max-w-md space-y-4"

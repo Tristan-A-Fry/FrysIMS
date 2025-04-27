@@ -1,28 +1,16 @@
-
-import { jwtDecode } from "jwt-decode";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
-import { useEffect ,useState } from "react";
+import { useState } from "react";
 
 const Navbar = () => {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated,userRole, logout } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [userRole, setUserRole] = useState("");
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        const role = decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
-        setUserRole(role);
-      } catch (err) {
-        console.error("Invalid token:", err);
-        setUserRole("");
-      }
-    }
-  }, []);
+  if(isAuthenticated && userRole === null)
+  {
+    return null;
+  }
 
   return (
     <nav className="bg-gray-800 text-white p-4 top-0 w-full shadow-md">
